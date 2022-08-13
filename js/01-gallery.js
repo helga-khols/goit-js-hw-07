@@ -2,8 +2,9 @@ import { galleryItems } from './gallery-items.js';
 
 const pictureContainer = document.querySelector('.gallery')
 const pictureMarkup = createPictureCardMarkup(galleryItems);
+
 pictureContainer.insertAdjacentHTML("beforeend", pictureMarkup)
-pictureContainer.addEventListener('click', onPictureShowModalClick);
+pictureContainer.addEventListener('click', onClick);
 
 
 function createPictureCardMarkup(galleryItems) {
@@ -21,24 +22,21 @@ function createPictureCardMarkup(galleryItems) {
     }).join("");
 };
 
-
-function onPictureShowModalClick(e) {
-    e.preventDefault();
-
-    if (e.target.nodeName !== 'IMG') {
+function onClick(event) {
+    event.preventDefault();
+    if (event.target.nodeName !== 'IMG') {
         return;
     }
 
-    const pictureCard = basicLightbox.create(
-        `<img src="${e.target.dataset.source}" width="800" height="600">`);
-    pictureCard.show();
+    const instance = basicLightbox.create(`<img src="${event.target.dataset.source}">`);
+    instance.show()
 
-    if (pictureCard.visible()) {
-        pictureContainer.addEventListener('keydown', (e) => {
-            if (e.code === 'Escape') {
-                pictureCard.close()
-            }
+    window.addEventListener("keydown", onEscClose);
+
+    function onEscClose(event) {
+        if (event.code === "Escape") {
+            window.removeEventListener("keydown", onEscClose);
+            instance.close();
         }
-        );
-    };
+    }
 }
